@@ -3,5 +3,5 @@ pandas
 numpy
 scikit-learn
 matplotlib
-tensorflow==2.12.0
+tensorflow==2.15.0
 statsmodels
