@@ -1,14 +1,12 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[7]:
-
-
 import streamlit as st
 import pandas as pd
 import numpy as np
 import pickle
 import matplotlib.pyplot as plt
+from tensorflow.keras.models import load_model
 
 # Wrapper class untuk Hybrid Model
 class HybridSARIMAXNN:
@@ -18,23 +16,25 @@ class HybridSARIMAXNN:
         self.scaler = scaler
 
     def predict(self, X_sarimax, X_nn):
-        sarimax_pred = self.sarimax.predict(start=0, end=len(X_sarimax)-1, exog=X_sarimax)
+        sarimax_pred = self.sarimax.predict(exog=X_sarimax)
         X_nn_scaled = self.scaler.transform(X_nn)
         nn_pred = self.nn.predict(X_nn_scaled).flatten()
-        return sarimax_pred.values + nn_pred
+        return sarimax_pred + nn_pred
 
 # Judul halaman
 st.title("🍘 Hybrid Forecasting: SARIMAX + Neural Network untuk Produk WAFER")
 st.write("Prediksi penjualan produk *wafer* menggunakan model hybrid SARIMAX + Neural Network (NN).")
 
-# Load 1 model hybrid (wafer)
+# Fungsi untuk memuat model hybrid dari 2 file: .pkl dan .h5
 @st.cache_resource
-def load_model():
-    with open("hybrid_model_wafer.pkl", "rb") as f:
-        model = pickle.load(f)
-    return model
+def load_model_bundle():
+    with open("hybrid_wafers_components.pkl", "rb") as f:
+        bundle = pickle.load(f)
+    nn_model = load_model("nn_wafers_model.h5")
+    hybrid_model = HybridSARIMAXNN(bundle["sarimax"], nn_model, bundle["scaler"])
+    return hybrid_model
 
-model = load_model()
+model = load_model_bundle()
 
 # Upload file fitur exogenous
 uploaded_file = st.file_uploader("📁 Upload file exogenous (exog_wafers.csv)", type="csv")
@@ -69,10 +69,3 @@ if uploaded_file is not None:
 
         except Exception as e:
             st.error(f"❌ Terjadi kesalahan saat prediksi: {e}")
-
-
-# In[ ]:
-
-
-
-
