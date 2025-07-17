@@ -8,7 +8,9 @@ import pickle
 import matplotlib.pyplot as plt
 from tensorflow.keras.models import load_model
 
-# Wrapper class untuk Hybrid Model
+# =====================================
+# Hybrid Model Class (with adjusted prediction range)
+# =====================================
 class HybridSARIMAXNN:
     def __init__(self, sarimax_model, nn_model, scaler):
         self.sarimax = sarimax_model
@@ -16,16 +18,25 @@ class HybridSARIMAXNN:
         self.scaler = scaler
 
     def predict(self, X_sarimax, X_nn):
-        sarimax_pred = self.sarimax.predict(exog=X_sarimax)
+        # Mulai prediksi SARIMAX setelah data training berakhir
+        start = len(self.sarimax.data.endog)
+        end = start + len(X_sarimax) - 1
+
+        sarimax_pred = self.sarimax.predict(start=start, end=end, exog=X_sarimax)
+
+        # Neural Net prediction
         X_nn_scaled = self.scaler.transform(X_nn)
         nn_pred = self.nn.predict(X_nn_scaled).flatten()
+
         return sarimax_pred + nn_pred
 
-# Judul halaman
+# =====================================
+# Streamlit App
+# =====================================
 st.title("🍘 Hybrid Forecasting: SARIMAX + Neural Network untuk Produk WAFER")
 st.write("Prediksi penjualan produk *wafer* menggunakan model hybrid SARIMAX + Neural Network (NN).")
 
-# Fungsi untuk memuat model hybrid dari 2 file: .pkl dan .h5
+# Load Model Bundle
 @st.cache_resource
 def load_model_bundle():
     with open("hybrid_wafers_components.pkl", "rb") as f:
@@ -45,7 +56,7 @@ if uploaded_file is not None:
     st.write("📊 Data Exogenous yang Diupload:")
     st.dataframe(df_exog.head())
 
-    # Tombol prediksi
+    # Tombol Prediksi
     if st.button("🔮 Prediksi Penjualan Wafer"):
         try:
             X_sarimax = df_exog.copy()
@@ -54,11 +65,11 @@ if uploaded_file is not None:
             # Prediksi hybrid
             forecast = model.predict(X_sarimax, X_nn)
 
-            # Tampilkan hasil
+            # Tampilkan hasil prediksi
             st.subheader("📈 Hasil Prediksi Penjualan Wafer")
             st.line_chart(forecast)
 
-            # Bandingkan dengan aktual jika ada
+            # Bandingkan dengan aktual jika tersedia
             if 'actual' in df_exog.columns:
                 st.subheader("📊 Perbandingan Forecast vs Aktual")
                 fig, ax = plt.subplots(figsize=(10, 5))
