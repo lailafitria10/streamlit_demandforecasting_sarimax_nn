@@ -6,8 +6,8 @@ This Streamlit app predicts product sales (currently WAFER) using a hybrid time 
 
 ## Files
 - `streamlit_app.py` — Main Streamlit app script
-- `hybrid_model_wafer.pkl` — Trained hybrid model for WAFER
-- `exog_wafers.csv` — Sample exogenous data input for forecasting
+- `hybrid_wafers_components.pkl` — Trained hybrid model for WAFER
+- `exog_wafers2.csv` — Sample exogenous data input for forecasting
 - `requirements.txt` — Dependencies for deployment
 
 ## How to run locally
