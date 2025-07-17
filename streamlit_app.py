@@ -48,7 +48,7 @@ def load_model_bundle():
 model = load_model_bundle()
 
 # Upload file fitur exogenous
-uploaded_file = st.file_uploader("📁 Upload file exogenous (exog_wafers.csv)", type="csv")
+uploaded_file = st.file_uploader("📁 Upload file exogenous (exog_wafers2.csv)", type="csv")
 
 if uploaded_file is not None:
     df_exog = pd.read_csv(uploaded_file)
