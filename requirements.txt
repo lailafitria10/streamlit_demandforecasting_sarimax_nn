@@ -1,7 +1,7 @@
-streamlit>=1.27.0
-pandas
-numpy
-scikit-learn
-matplotlib
+streamlit>=1.27.0,<2.0.0
+pandas>=1.5,<2.1
+numpy>=1.23,<1.26
+scikit-learn>=1.2,<1.4
+matplotlib>=3.5,<3.8
 tensorflow==2.15.0
-statsmodels
+statsmodels>=0.13,<0.14
